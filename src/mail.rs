@@ -3,7 +3,7 @@ use lettre::transport::smtp::authentication::Credentials;
 use lettre::{Message, SmtpTransport, Transport};
 
 pub async fn send_email(current_ip:&str, new_ip: &str) {
-    let email = ("gmail account here", "App password goes here. This is NOT your gmail password"); // https://myaccount.google.com/apppasswords
+    let email = ("GMAIL ACCOUNT HERE", "APP PASSWORD GOES HERE. THIS IS NOT YOUR GMAIL PASSWORD"); // https://myaccount.google.com/apppasswords
     let creds = Credentials::new(email.0.to_owned(), email.1.to_owned());
     let builder = Message::builder()
     .from(email.0.parse().unwrap())
