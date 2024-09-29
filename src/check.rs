@@ -7,26 +7,39 @@ use tokio::time::sleep;
 use crate::mail;
 
 const WAIT_TIME: u64 = 300;
+
 pub struct CheckIP;
 
 impl CheckIP {
     async fn check() -> Result<String, Error> {
-        tracing::trace!("Sending HTTP request...");
-        match reqwest::get("https://httpbin.org/ip").await {
-            Ok(resp) => {
-                match resp.json::<HashMap<String, String>>().await {
-                    Ok(r) => {
-                        if let Some(ip) = r.get("origin") {
-                            Ok(String::from(ip))
-                        } else {
-                            Err(anyhow!("failed to get IP from response!"))
+        let apis = ["https://httpbin.org/ip", "https://api.ipify.org/?format=json", "https://api.seeip.org/jsonip"];
+        tracing::debug!("Sending HTTP request...");
+
+        for (k, v) in apis.iter().enumerate() {
+            match reqwest::get(*v).await {
+                Ok(resp) => {
+                    match resp.json::<HashMap<String, String>>().await {
+                        Ok(r) => {
+                            if k == 0 {
+                                if let Some(ip) = r.get("origin") {
+                                    return Ok(String::from(ip));
+                                } else {
+                                    tracing::error!("failed to get IP from response!");
+                                }
+                            } else if let Some(ip) = r.get("ip") {
+                                return Ok(String::from(ip));
+                            } else {
+                                tracing::error!("Failed to get IP from response!");
+                            }
                         }
+                        Err(e) =>{ tracing::error!("Failed to parse response as JSON: {}", e); }
                     }
-                    Err(e) => Err(anyhow!("failed to parse response as JSON: {e}")),
                 }
+                Err(e) => tracing::error!("Failed to send request to remote server: {}", e),
             }
-            Err(e) => Err(anyhow!("failed to send request to remote server: {e}")),
         }
+
+        Err(anyhow!("Failed to complete request to all providers!"))
     }
 
 
@@ -35,6 +48,7 @@ impl CheckIP {
         let mut current_ip: String = String::new();
 
         // Get current IP and store in var
+        tracing::info!("Getting inital IP");
         match Self::check().await {
             Ok(new_ip) => {
                 if new_ip != current_ip {
@@ -55,13 +69,11 @@ impl CheckIP {
                             mail::send_email(&current_ip, &new_ip).await;
                             current_ip = new_ip;
                         }
-                        else {
-                            tracing::info!("IP hasn't changed. Ignoring")
-                        }
-                        old_time = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs();
+                        else { tracing::info!("IP hasn't changed. Ignoring") }
                     }
                     Err(e) => tracing::error!("Error: {}", e),
                 }
+                old_time = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs();
             } else {
                 tracing::debug!("Not checking IP since {WAIT_TIME} secs not passed");
                 sleep(Duration::from_secs(1)).await

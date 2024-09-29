@@ -1,0 +1,3 @@
+/target
+src/mail.rs
+Cargo.lock

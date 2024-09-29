@@ -12,7 +12,6 @@ pub async fn send_email(current_ip:&str, new_ip: &str) {
     .header(ContentType::TEXT_PLAIN)
     .body(format!("Your home IP has changed from {current_ip} to {new_ip}")).unwrap();
 
-
     // Open a remote connection to gmail
     match SmtpTransport::relay("smtp.gmail.com") {
         Ok(c) => {
