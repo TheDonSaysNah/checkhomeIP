@@ -2,7 +2,7 @@
 name = "checkhomeip"
 version = "1.0.0"
 edition = "2021"
-Author = "TheDonSaysNah"
+author = "TheDonSaysNah"
 
 [dependencies]
 reqwest = { version = "0.12", features = ["json"] }
