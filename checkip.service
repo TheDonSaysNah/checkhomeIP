@@ -7,7 +7,7 @@ StartLimitIntervalSec=0
 Type=simple
 Restart=always
 RestartSec=10
-User=
+User=user
 ExecStart=/path/to/checkhomeip
 
 [Install]
