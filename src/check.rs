@@ -13,9 +13,9 @@ pub struct CheckIP;
 impl CheckIP {
     async fn check() -> Result<String, Error> {
         let apis = ["https://httpbin.org/ip", "https://api.ipify.org/?format=json", "https://api.seeip.org/jsonip"];
-        tracing::debug!("Sending HTTP request...");
 
         for (k, v) in apis.iter().enumerate() {
+            tracing::debug!("Sending HTTP request to {v}");
             match reqwest::get(*v).await {
                 Ok(resp) => {
                     match resp.json::<HashMap<String, String>>().await {

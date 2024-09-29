@@ -1,4 +1,4 @@
 /target
 Cargo.lock
-src/mail.rs
-src/mail.rs
+/src/mail.rs
+mail.rs
