@@ -11,7 +11,6 @@ tokio = { version = "^1", features = ["macros", "rt-multi-thread", "signal"] }
 tracing-subscriber = { version = "^0.3.18", features = ["std", "time", "env-filter"] }
 
 anyhow = "1.0.89"
-flume = "0.11.0"
 lettre = "0.11.9"
 tracing = "0.1.40"
 tokio-util = "0.7.12"
