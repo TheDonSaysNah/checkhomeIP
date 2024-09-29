@@ -10,7 +10,7 @@ mod check;
 mod mail;
 
 fn main() {
-    //Setup tracing with my preferred logging format
+    // Setup tracing with my preferred logging format
     // env::set_var("RUST_BACKTRACE", "full");
     let time_format = time::format_description::parse("[[[year]-[month]-[day] [hour]:[minute]:[second].[subsecond digits:3]]").unwrap();
     let default = format!("{}={}", env!("CARGO_PKG_NAME"), if !cfg!(debug_assertions) { LevelFilter::INFO } else { LevelFilter::TRACE }).parse().unwrap();
@@ -29,10 +29,6 @@ fn main() {
     let token_cl = token.clone();
 
     runtime.spawn(async move {
-        if !cfg!(debug_assertions) {} else {
-            tracing::warn!("Running in debug mode! Run in release mode for optimisations")
-        }
-
         tokio::select! {
             _ = rt_cl.spawn(async move { check::CheckIP::init().await; }) => {}
             _ = token_cl.cancelled() => tracing::warn!("Token cancelled"),

@@ -24,7 +24,7 @@ impl CheckIP {
                                 if let Some(ip) = r.get("origin") {
                                     return Ok(String::from(ip));
                                 } else {
-                                    tracing::error!("failed to get IP from response!");
+                                    tracing::error!("Failed to get IP from response!");
                                 }
                             } else if let Some(ip) = r.get("ip") {
                                 return Ok(String::from(ip));
@@ -38,27 +38,26 @@ impl CheckIP {
                 Err(e) => tracing::error!("Failed to send request to remote server: {}", e),
             }
         }
-
         Err(anyhow!("Failed to complete request to all providers!"))
     }
 
 
     pub async fn init() {
-        let mut old_time: u64 = 0;
+        let mut old_time: u64;
         let mut current_ip: String = String::new();
 
         // Get current IP and store in var
-        tracing::info!("Getting inital IP");
+        tracing::info!("Getting initial IP");
         match Self::check().await {
             Ok(new_ip) => {
                 if new_ip != current_ip {
                     current_ip = new_ip.clone();
                     tracing::info!("Initial IP set: {new_ip}");
-                    old_time = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs();
                 }
             }
             Err(e) => tracing::error!("Error: {}", e),
         }
+        old_time = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs();
 
         loop {
             if SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs() >= old_time + WAIT_TIME {
@@ -75,7 +74,7 @@ impl CheckIP {
                 }
                 old_time = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs();
             } else {
-                tracing::debug!("Not checking IP since {WAIT_TIME} secs not passed");
+                tracing::debug!("Not checking IP due to {WAIT_TIME} seconds not passing");
                 sleep(Duration::from_secs(1)).await
             }
         }
