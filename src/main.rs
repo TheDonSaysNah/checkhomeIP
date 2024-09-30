@@ -1,6 +1,5 @@
-use std::{env, process};
+use std::process;
 
-use dotenv::dotenv;
 use time::{UtcOffset, OffsetDateTime};
 use tokio::signal;
 use tokio::{runtime::Builder, time::Duration};
@@ -24,7 +23,7 @@ fn main() {
     tracing::subscriber::set_global_default(sub).unwrap();
 
     // Load env vars. Unwrap is fine here because if vars are missing/incorrect then program can't run correctly anyway
-    tracing::info!("Using {:?}", dotenv().unwrap());
+    dotenv::from_path("checkip.env").unwrap();
 
     let runtime = Builder::new_multi_thread().thread_name("ip_runtime").enable_all().build().unwrap();
     let rt_cl = runtime.handle().clone();

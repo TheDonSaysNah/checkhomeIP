@@ -9,6 +9,7 @@ Restart=always
 RestartSec=10
 User=user
 ExecStart=/path/to/checkhomeip
+WorkingDirectory=/path/to/checkhomeip
 
 [Install]
 WantedBy=multi-user.target
