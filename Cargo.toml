@@ -1,6 +1,6 @@
 [package]
 name = "checkhomeip"
-version = "1.0.2"
+version = "1.1.0"
 edition = "2021"
 author = "TheDonSaysNah"
 
@@ -11,6 +11,7 @@ tokio = { version = "^1", features = ["macros", "rt-multi-thread", "signal"] }
 tracing-subscriber = { version = "^0.3.18", features = ["std", "time", "env-filter"] }
 
 anyhow = "1.0.89"
+dotenv = "0.15.0"
 lettre = "0.11.9"
 tracing = "0.1.40"
 tokio-util = "0.7.12"

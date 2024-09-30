@@ -6,8 +6,6 @@ use tokio::time::sleep;
 
 use crate::mail;
 
-const WAIT_TIME: u64 = 300;
-
 pub struct CheckIP;
 
 impl CheckIP {
@@ -45,6 +43,7 @@ impl CheckIP {
     pub async fn init() {
         let mut old_time: u64;
         let mut current_ip: String = String::new();
+        let wait_time = std::env::var("RECHECK_INTERVAL").unwrap().parse::<u64>().unwrap();
 
         // Get current IP and store in var
         tracing::info!("Getting initial IP");
@@ -60,7 +59,7 @@ impl CheckIP {
         old_time = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs();
 
         loop {
-            if SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs() >= old_time + WAIT_TIME {
+            if SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs() >= old_time + wait_time {
                 match Self::check().await {
                     Ok(new_ip) => {
                         if new_ip != current_ip {
@@ -74,7 +73,7 @@ impl CheckIP {
                 }
                 old_time = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs();
             } else {
-                tracing::debug!("Not checking IP due to {WAIT_TIME} seconds not passing");
+                tracing::debug!("Not checking IP due to {wait_time} seconds not passing");
                 sleep(Duration::from_secs(1)).await
             }
         }
