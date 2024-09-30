@@ -5,6 +5,8 @@ A small and lightweight program to monitor your home IP 24/7 and send an email t
 ## Getting started
 To get started, fill out `.env` with the SMTP host and credentials you wish to use. Thats it! Just compile and run.
 
+*This has only been tested wth GMail SMTP. Other hosts may not work.*
+
 ### Systemd service setup
 To enable systemd service automation, edit `checkip.service` and change the line containing `ExecStart=/path/to/checkhomeip` to where the binary is in your filesystem.
 
