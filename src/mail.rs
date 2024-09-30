@@ -13,7 +13,7 @@ pub async fn send_email(current_ip:&str, new_ip: &str) {
     .body(format!("Your home IP has changed from {current_ip} to {new_ip}")).unwrap();
 
     // Open a remote connection to gmail
-    match SmtpTransport::relay("smtp.gmail.com") {
+    match SmtpTransport::relay(&std::env::var("SMTP_HOST").unwrap()) {
         Ok(c) => {
             let cc = c.credentials(creds).build();
             match cc.send(&builder) {
