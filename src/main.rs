@@ -34,7 +34,7 @@ fn main() {
     runtime.spawn(async move {
         tokio::select! {
             _ = rt_cl.spawn(async move { check::CheckIP::init().await; }) => {}
-            _ = token_cl.cancelled() => tracing::warn!("Token cancelled"),
+            _ = token_cl.cancelled() => tracing::debug!("Token cancelled"),
         }
     });
 

@@ -33,41 +33,35 @@ impl CheckIP {
                         Err(e) =>{ tracing::error!("Failed to parse response as JSON: {}", e); }
                     }
                 }
-                Err(e) => tracing::error!("Failed to send request to remote server: {}", e),
+                Err(e) => tracing::error!("Error: {}", e),
             }
         }
-        Err(anyhow!("Failed to complete request to all providers!"))
+        Err(anyhow!("failed to complete request to all providers!"))
     }
 
 
     pub async fn init() {
-        let mut old_time: u64;
+        let mut first = false;
+        let mut old_time = 0;
         let mut current_ip: String = String::new();
         let wait_time = std::env::var("RECHECK_INTERVAL").unwrap().parse::<u64>().unwrap();
 
-        // Get current IP and store in var
         tracing::info!("Getting initial IP");
-        match Self::check().await {
-            Ok(new_ip) => {
-                if new_ip != current_ip {
-                    current_ip = new_ip.clone();
-                    tracing::info!("Initial IP set: {new_ip}");
-                }
-            }
-            Err(e) => tracing::error!("Error: {}", e),
-        }
-        old_time = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs();
-
         loop {
             if SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs() >= old_time + wait_time {
                 match Self::check().await {
                     Ok(new_ip) => {
-                        if new_ip != current_ip {
+                        if new_ip != current_ip && first && !current_ip.is_empty() {
                             tracing::info!("Your home IP has changed from {current_ip} to {new_ip}");
                             mail::send_email(&current_ip, &new_ip).await;
-                            current_ip = new_ip;
+                            current_ip = new_ip.clone();
                         }
-                        else { tracing::info!("IP hasn't changed. Ignoring") }
+                        else if new_ip == current_ip && first { tracing::info!("IP hasn't changed. Ignoring") }
+
+                        if !first { // Get current IP and store in var
+                            tracing::info!("Initial IP set: {new_ip}");
+                            first = true;
+                        }
                     }
                     Err(e) => tracing::error!("Error: {}", e),
                 }
