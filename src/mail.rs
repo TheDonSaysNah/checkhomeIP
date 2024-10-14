@@ -10,7 +10,7 @@ pub async fn send_email(current_ip:&str, new_ip: &str) {
     .to(email.0.parse().unwrap())
     .subject("Home IP has changed")
     .header(ContentType::TEXT_PLAIN)
-    .body(format!("Your home IP has changed from {current_ip} to {new_ip}")).unwrap();
+    .body(format!("Your home IP has changed from \"{current_ip}\" to \"{new_ip}\"")).unwrap();
 
     // Open a remote connection to gmail
     match SmtpTransport::relay(&std::env::var("SMTP_HOST").unwrap()) {
@@ -21,6 +21,6 @@ pub async fn send_email(current_ip:&str, new_ip: &str) {
                 Err(e) => tracing::error!("Error: could not send email: {e:?}"),
             }
         }
-        Err(e) => tracing::error!("Error: could not connect to Gmail: {e}"),
+        Err(e) => tracing::error!("Error: could not connect to SMTP host: {e}"),
     }
 }

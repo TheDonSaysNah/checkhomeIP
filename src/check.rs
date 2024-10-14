@@ -51,15 +51,17 @@ impl CheckIP {
             if SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs() >= old_time + wait_time {
                 match Self::check().await {
                     Ok(new_ip) => {
-                        if new_ip != current_ip && first && !current_ip.is_empty() {
-                            tracing::info!("Your home IP has changed from {current_ip} to {new_ip}");
-                            mail::send_email(&current_ip, &new_ip).await;
+                        if new_ip != current_ip {
+                            if !current_ip.is_empty() && first {
+                                tracing::info!("Your home IP has changed from \"{current_ip}\" to \"{new_ip}\"");
+                                mail::send_email(&current_ip, &new_ip).await;
+                            }
                             current_ip = new_ip.clone();
                         }
                         else if new_ip == current_ip && first { tracing::info!("IP hasn't changed. Ignoring") }
 
                         if !first { // Get current IP and store in var
-                            tracing::info!("Initial IP set: {new_ip}");
+                            tracing::info!("Initial IP set: \"{new_ip}\"");
                             first = true;
                         }
                     }
