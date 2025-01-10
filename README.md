@@ -1,6 +1,6 @@
 # CheckHomeIP
 
-A small and lightweight program to monitor your home IP 24/7 and notify yourself by sending an email using SMTP or using [NTFY](https://ntfy.sh). Useful for people who don't have DDNS and need to know if their ISP assigned IP has been changed.
+A small and lightweight program to monitor your home IP 24/7 and notify yourself by either sending an email using SMTP or using [NTFY](https://ntfy.sh). Useful for people who don't have DDNS and need to know if their ISP assigned IP has been changed.
 
 ## Getting started
 To get started, fill out `checkip.env` with the SMTP or NTFY fields you wish to use. Compile and run.
