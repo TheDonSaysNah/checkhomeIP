@@ -3,7 +3,7 @@
 A small and lightweight program to monitor your home IP 24/7 and notify yourself by sending an email using SMTP or using [NTFY](https://ntfy.sh). Useful for people who don't have DDNS and need to know if their ISP assigned IP has been changed.
 
 ## Getting started
-To get started, fill out `checkip.env` with the SMTP host and credentials you wish to use. Thats it! Just compile and run.
+To get started, fill out `checkip.env` with the SMTP or NTFY fields you wish to use. Compile and run.
 
 *This has only been tested with GMail SMTP. Other hosts may not work.*
 
