@@ -2,19 +2,20 @@ use std::collections::HashMap;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 use anyhow::{anyhow, Error};
+use reqwest::Client;
 use tokio::time::sleep;
 
-use crate::mail;
+use crate::{notify, Args};
 
 pub struct CheckIP;
 
 impl CheckIP {
-    async fn check() -> Result<String, Error> {
+    async fn check(client: &Client) -> Result<String, Error> {
         let apis = ["https://httpbin.org/ip", "https://api.ipify.org/?format=json", "https://api.seeip.org/jsonip"];
 
         for (k, v) in apis.iter().enumerate() {
             tracing::debug!("Sending HTTP request to {v}");
-            match reqwest::get(*v).await {
+            match client.get(*v).timeout(Duration::from_secs(10)).send().await {
                 Ok(resp) => {
                     match resp.json::<HashMap<String, String>>().await {
                         Ok(r) => {
@@ -40,21 +41,23 @@ impl CheckIP {
     }
 
 
-    pub async fn init() {
+    pub async fn init(app: Args) {
         let mut first = false;
         let mut old_time = 0;
         let mut current_ip: String = String::new();
+        let client = reqwest::Client::new();
         let wait_time = std::env::var("RECHECK_INTERVAL").unwrap().parse::<u64>().unwrap();
 
         tracing::info!("Getting initial IP");
         loop {
             if SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs() >= old_time + wait_time {
-                match Self::check().await {
+                match Self::check(&client).await {
                     Ok(new_ip) => {
                         if new_ip != current_ip {
                             if !current_ip.is_empty() && first {
                                 tracing::info!("Your home IP has changed from \"{current_ip}\" to \"{new_ip}\"");
-                                mail::send_email(&current_ip, &new_ip).await;
+                                if app.email { notify::send_email(&current_ip, &new_ip).await; }
+                                if app.ntfy { notify::send_ntfy(&client, &current_ip, &new_ip).await; }
                             }
                             current_ip = new_ip.clone();
                         }

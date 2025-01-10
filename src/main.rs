@@ -1,5 +1,6 @@
 use std::process;
 
+use clap::Parser;
 use time::{UtcOffset, OffsetDateTime};
 use tokio::signal;
 use tokio::{runtime::Builder, time::Duration};
@@ -7,7 +8,18 @@ use tokio_util::sync::CancellationToken;
 use tracing_subscriber::{EnvFilter, filter::LevelFilter, fmt::time::OffsetTime};
 
 mod check;
-mod mail;
+mod notify;
+
+#[derive(Parser, Debug)]
+#[clap(author="TheDonSaysNah", version=env!("CARGO_PKG_VERSION"), about="A small tool to monitor your home IP and alert you if it changes.", long_about = None)]
+pub struct Args {
+    #[arg(short='e', long, help="Notify by email",)]
+    email: bool,
+
+    #[arg(short='n', long, help="Notify by NTFY service: https://ntfy.sh/")]
+    ntfy: bool
+}
+
 
 fn main() {
     // Setup tracing with my preferred logging format
@@ -31,9 +43,20 @@ fn main() {
     let token = CancellationToken::new();
     let token_cl = token.clone();
 
+    let app: Args = Args::parse();
+    if !app.email && !app.ntfy {
+        tracing::error!("No notification channel has been specified! Use -h for more info.");
+        process::exit(1);
+    } else {
+        let mut trues: Vec<&str> = vec![];
+        if app.email { trues.push("email"); }
+        if app.ntfy { trues.push("NTFY"); }
+        tracing::info!("Using {} to send notifications.", trues.join(" and "))
+    }
+
     runtime.spawn(async move {
         tokio::select! {
-            _ = rt_cl.spawn(async move { check::CheckIP::init().await; }) => {}
+            _ = rt_cl.spawn(async move { check::CheckIP::init(app).await; }) => {}
             _ = token_cl.cancelled() => tracing::debug!("Token cancelled"),
         }
     });
