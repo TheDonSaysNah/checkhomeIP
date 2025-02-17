@@ -1,11 +1,12 @@
 [package]
 name = "checkhomeip"
-version = "2025.1.11"
+version = "2025.2.17"
 edition = "2021"
 authors = ["TheDonSaysNah"]
 
 [dependencies]
 clap = { version = "4.5.26", features = ["derive"] }
+local-ip-address = "0.6.3"
 reqwest = { version = "0.12.12", features = ["json"] }
 time = { version = "0.3.37", features = ["formatting", "parsing", "local-offset"] }
 tokio = { version = "1.43.0", features = ["macros", "rt-multi-thread", "signal"] }

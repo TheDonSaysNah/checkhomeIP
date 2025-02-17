@@ -13,6 +13,9 @@ mod notify;
 #[derive(Parser, Debug)]
 #[clap(author="TheDonSaysNah", version=env!("CARGO_PKG_VERSION"), about="A small tool to monitor your home IP and alert you if it changes.", long_about = None)]
 pub struct Args {
+	#[arg(short='c', long, help="If true then notify the server with the client name and local IP")]
+	client: Option<String>,
+
 	#[arg(short='e', long, help="Notify by email",)]
 	email: bool,
 
