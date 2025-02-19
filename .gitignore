@@ -2,3 +2,5 @@
 Cargo.lock
 .vscode
 .env
+.idea/
+checkip.env

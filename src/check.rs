@@ -15,7 +15,7 @@ impl CheckIP {
 
         for (k, v) in apis.iter().enumerate() {
             tracing::debug!("Sending HTTP request to {v}");
-            match client.get(*v).timeout(Duration::from_secs(10)).send().await {
+            match client.get(*v).timeout(Duration::from_secs(20)).send().await {
                 Ok(resp) => {
                     match resp.json::<HashMap<String, String>>().await {
                         Ok(r) => {
@@ -55,10 +55,11 @@ impl CheckIP {
                     Ok(new_ip) => {
                         if new_ip != current_ip {
                             if !current_ip.is_empty() && first {
-                                let body = format!("{} IP has changed from \"{current_ip}\" to \"{new_ip}\"", if app.client.is_some() { app.client.as_ref().unwrap() } else {"Your home"});
-                                tracing::info!("Your home IP has changed from \"{current_ip}\" to \"{new_ip}\"");
-                                if app.email { notify::send_email(body.clone(), None).await; }
-                                if app.ntfy { notify::send_ntfy(&client, body, None).await; }
+                                let body = format!("{} IP has changed from \"{current_ip}\" to \"{new_ip}\"", if app.client.is_some() { app.client.as_ref().unwrap() } else { "Your home" });
+                                tracing::info!("{} IP has changed from \"{current_ip}\" to \"{new_ip}\"", if app.client.is_some() { app.client.as_ref().unwrap() } else { "Your home" });
+
+                                if app.email { notify::send_email(body.clone(), if app.client.is_some() { app.client.as_deref() } else { None }).await; }
+                                if app.ntfy { notify::send_ntfy(&client, body, if app.client.is_some() { app.client.as_deref() } else { None }).await; }
                             }
                             current_ip = new_ip.clone();
                         }
@@ -70,8 +71,8 @@ impl CheckIP {
                                 let localip = local_ip().unwrap();
                                 tracing::info!("Local IP set at \"{localip}\"");
                                 let body = format!("External IP \"{current_ip}\"\nLocal IP: {localip}");
-                                if app.email { notify::send_email(body.clone(), app.client.clone()).await; }
-                                if app.ntfy { notify::send_ntfy(&client, body, app.client.clone()).await; }
+                                if app.email { notify::send_email(body.clone(), app.client.as_deref()).await; }
+                                if app.ntfy { notify::send_ntfy(&client, body, app.client.as_deref()).await; }
 
                             }
                             first = true;
