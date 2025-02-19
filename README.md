@@ -17,7 +17,7 @@ Finally, enable the service and start it using `systemctl enable --now checkip.s
 
 ### New client env arg
 A new env arg has been introduced and is enabled with -c/--client.
-The purpose of this was mainly for myself as I have 2 different networks across my home country so by using -c I can determine which network had the IP changed.
+The purpose of this was mainly for myself as I have 2 different networks across my home country so by using ``-c`` I can determine which network had the IP changed.
 
 Example: ``./checkhomeip -nc parents``
 - ``-n`` to notify using [NTFY](https://ntfy.sh) service.
