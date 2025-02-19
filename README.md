@@ -14,3 +14,13 @@ Once done, change the line `User=user` to the user account you wish the service 
 
 Finally, enable the service and start it using `systemctl enable --now checkip.service`
 
+
+### New client env arg
+A new env arg has been introduced and is enabled with -c/--client.
+The purpose of this was mainly for myself as I have 2 different networks across my home country so by using -c I can determine which network had the IP changed.
+
+Example: ``./checkhomeip -nc parents``
+- ``-n`` to notify using [NTFY](https://ntfy.sh) service.
+- ``-c parents`` all notifications will be titled with "parents" and also gives the local IP. Useful if you are unable to set a static local IP and need to SSH. 
+
+
